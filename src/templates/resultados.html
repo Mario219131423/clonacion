@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Tu Rutina Personalizada</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Información General</h5>
+                            <ul class="list-unstyled">
+                                <li><strong>Nivel:</strong> {{ recommendations.nivel|title }}</li>
+                                <li><strong>Objetivo:</strong> {{ recommendations.objetivo|title }}</li>
+                                <li><strong>Días de Entrenamiento:</strong> {{ recommendations.dias_entrenamiento|join(', ')|title }}</li>
+                                <li><strong>Grupos Musculares:</strong> {{ recommendations.grupos_musculares|join(', ')|title }}</li>
+                                <li><strong>Equipamiento:</strong> {% if recommendations.requiere_equipo %}Sí{% else %}No{% endif %}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Recomendaciones</h5>
+                            <ul class="list-unstyled">
+                                {% for recomendacion in recommendations.recomendaciones %}
+                                <li><i class="fas fa-check-circle text-success"></i> {{ recomendacion }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3">Rutina Semanal</h5>
+                    {% for dia, rutina in recommendations.rutina_semanal.items() %}
+                    <div class="card mb-3">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">{{ dia|title }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Duración total: {{ rutina.duracion_formateada }}</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Ejercicio</th>
+                                            <th>Grupo Muscular</th>
+                                            <th>Series</th>
+                                            <th>Repeticiones</th>
+                                            <th>Descanso</th>
+                                            <th>Duración</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for ejercicio in rutina.ejercicios %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ ejercicio.nombre }}</strong>
+                                                <button type="button" class="btn btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#instrucciones{{ loop.index }}">
+                                                    Ver Instrucciones
+                                                </button>
+                                            </td>
+                                            <td>{{ ejercicio.grupo_muscular|title }}</td>
+                                            <td>{{ ejercicio.series }}</td>
+                                            <td>{{ ejercicio.repeticiones }}</td>
+                                            <td>{{ ejercicio.descanso }}</td>
+                                            <td>{{ ejercicio.duracion_aproximada }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modales para instrucciones -->
+{% for dia, rutina in recommendations.rutina_semanal.items() %}
+{% for ejercicio in rutina.ejercicios %}
+<div class="modal fade" id="instrucciones{{ loop.index }}" tabindex="-1" aria-labelledby="instruccionesLabel{{ loop.index }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="instruccionesLabel{{ loop.index }}">{{ ejercicio.nombre }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Instrucciones:</h6>
+                <p>{{ ejercicio.instrucciones }}</p>
+                {% if ejercicio.video_url %}
+                <div class="mt-3">
+                    <h6>Video Tutorial:</h6>
+                    <div class="ratio ratio-16x9">
+                        <iframe src="{{ ejercicio.video_url }}" allowfullscreen></iframe>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endfor %}
+{% endblock %} 

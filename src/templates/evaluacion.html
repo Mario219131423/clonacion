@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Evaluación Inicial</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('evaluacion') }}">
+                        <!-- Información Personal -->
+                        <h5 class="mb-3">Información Personal</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="edad" class="form-label">Edad</label>
+                                <input type="number" class="form-control" id="edad" name="edad" required min="15" max="100">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="genero" class="form-label">Género</label>
+                                <select class="form-select" id="genero" name="genero" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="masculino">Masculino</option>
+                                    <option value="femenino">Femenino</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="altura" class="form-label">Altura (cm)</label>
+                                <input type="number" class="form-control" id="altura" name="altura" required min="100" max="250">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="peso" class="form-label">Peso (kg)</label>
+                                <input type="number" class="form-control" id="peso" name="peso" required min="30" max="200">
+                            </div>
+                        </div>
+
+                        <!-- Nivel de Actividad -->
+                        <h5 class="mb-3">Nivel de Actividad</h5>
+                        <div class="mb-3">
+                            <label for="fitness_level" class="form-label">Nivel de Condición Física</label>
+                            <select class="form-select" id="fitness_level" name="fitness_level" required>
+                                <option value="">Seleccione...</option>
+                                <option value="principiante">Principiante (0-6 meses de experiencia)</option>
+                                <option value="intermedio">Intermedio (6 meses - 2 años de experiencia)</option>
+                                <option value="avanzado">Avanzado (más de 2 años de experiencia)</option>
+                            </select>
+                        </div>
+
+                        <!-- Objetivos -->
+                        <h5 class="mb-3">Objetivos</h5>
+                        <div class="mb-3">
+                            <label for="goal" class="form-label">Objetivo Principal</label>
+                            <select class="form-select" id="goal" name="goal" required>
+                                <option value="">Seleccione...</option>
+                                <option value="fuerza">Aumentar Fuerza</option>
+                                <option value="resistencia">Mejorar Resistencia</option>
+                                <option value="hipertrofia">Ganar Masa Muscular</option>
+                                <option value="pérdida de peso">Pérdida de Peso</option>
+                            </select>
+                        </div>
+
+                        <!-- Disponibilidad -->
+                        <h5 class="mb-3">Disponibilidad</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Días disponibles para entrenar</label>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias_entrenamiento" value="lunes" id="lunes">
+                                        <label class="form-check-label" for="lunes">Lunes</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias_entrenamiento" value="martes" id="martes">
+                                        <label class="form-check-label" for="martes">Martes</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias_entrenamiento" value="miercoles" id="miercoles">
+                                        <label class="form-check-label" for="miercoles">Miércoles</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias_entrenamiento" value="jueves" id="jueves">
+                                        <label class="form-check-label" for="jueves">Jueves</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias_entrenamiento" value="viernes" id="viernes">
+                                        <label class="form-check-label" for="viernes">Viernes</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias_entrenamiento" value="sabado" id="sabado">
+                                        <label class="form-check-label" for="sabado">Sábado</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="dias_entrenamiento" value="domingo" id="domingo">
+                                        <label class="form-check-label" for="domingo">Domingo</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preferencias de Entrenamiento -->
+                        <h5 class="mb-3">Preferencias de Entrenamiento</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Grupos musculares a enfocar</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="preferred_muscle_groups" value="pecho" id="pecho">
+                                        <label class="form-check-label" for="pecho">Pecho</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="preferred_muscle_groups" value="espalda" id="espalda">
+                                        <label class="form-check-label" for="espalda">Espalda</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="preferred_muscle_groups" value="piernas" id="piernas">
+                                        <label class="form-check-label" for="piernas">Piernas</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="preferred_muscle_groups" value="brazos" id="brazos">
+                                        <label class="form-check-label" for="brazos">Brazos</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="preferred_muscle_groups" value="core" id="core">
+                                        <label class="form-check-label" for="core">Core</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Equipamiento -->
+                        <div class="mb-3">
+                            <label class="form-label">¿Tienes acceso a equipamiento?</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="equipment_available" value="true" id="equipment">
+                                <label class="form-check-label" for="equipment">Sí, tengo acceso a equipamiento</label>
+                            </div>
+                        </div>
+
+                        <!-- Condiciones Médicas -->
+                        <h5 class="mb-3">Condiciones Médicas</h5>
+                        <div class="mb-3">
+                            <label for="condiciones_medicas" class="form-label">Condiciones médicas o lesiones previas</label>
+                            <textarea class="form-control" id="condiciones_medicas" name="condiciones_medicas" rows="3" placeholder="Describa cualquier condición médica o lesión que pueda afectar su entrenamiento"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Generar Rutina</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

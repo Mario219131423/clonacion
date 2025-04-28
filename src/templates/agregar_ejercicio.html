@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title text-center mb-4">
+            <i class="fas fa-plus-circle me-2"></i>Agregar Nuevo Ejercicio
+        </h2>
+        
+        <form method="POST" action="{{ url_for('agregar_ejercicio') }}">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">
+                            <i class="fas fa-dumbbell me-2"></i>Nombre del Ejercicio
+                        </label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="grupo_muscular" class="form-label">
+                            <i class="fas fa-muscle me-2"></i>Grupo Muscular Principal
+                        </label>
+                        <select class="form-select" id="grupo_muscular" name="grupo_muscular" required>
+                            <option value="pecho">Pecho</option>
+                            <option value="espalda">Espalda</option>
+                            <option value="piernas">Piernas</option>
+                            <option value="brazos">Brazos</option>
+                            <option value="core">Core</option>
+                            <option value="hombros">Hombros</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="dificultad" class="form-label">
+                            <i class="fas fa-level-up-alt me-2"></i>Dificultad
+                        </label>
+                        <select class="form-select" id="dificultad" name="dificultad" required>
+                            <option value="principiante">Principiante</option>
+                            <option value="intermedio">Intermedio</option>
+                            <option value="avanzado">Avanzado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="requiere_equipo" class="form-label">
+                            <i class="fas fa-dumbbell me-2"></i>¿Requiere Equipo?
+                        </label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="requiere_equipo" id="equipo_si" value="true">
+                            <label class="form-check-label" for="equipo_si">Sí</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="requiere_equipo" id="equipo_no" value="false" checked>
+                            <label class="form-check-label" for="equipo_no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">
+                            <i class="fas fa-info-circle me-2"></i>Descripción
+                        </label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="instrucciones" class="form-label">
+                            <i class="fas fa-list-ol me-2"></i>Instrucciones
+                        </label>
+                        <textarea class="form-control" id="instrucciones" name="instrucciones" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="video_url" class="form-label">
+                            <i class="fas fa-video me-2"></i>URL del Video (opcional)
+                        </label>
+                        <input type="url" class="form-control" id="video_url" name="video_url">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="imagen_url" class="form-label">
+                            <i class="fas fa-image me-2"></i>URL de la Imagen (opcional)
+                        </label>
+                        <input type="url" class="form-control" id="imagen_url" name="imagen_url">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="series_recomendadas" class="form-label">
+                            <i class="fas fa-layer-group me-2"></i>Series Recomendadas
+                        </label>
+                        <input type="text" class="form-control" id="series_recomendadas" name="series_recomendadas" required>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="repeticiones_recomendadas" class="form-label">
+                            <i class="fas fa-redo me-2"></i>Repeticiones Recomendadas
+                        </label>
+                        <input type="text" class="form-control" id="repeticiones_recomendadas" name="repeticiones_recomendadas" required>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="descanso_recomendado" class="form-label">
+                            <i class="fas fa-clock me-2"></i>Tiempo de Descanso
+                        </label>
+                        <input type="text" class="form-control" id="descanso_recomendado" name="descanso_recomendado" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="musculos_secundarios" class="form-label">
+                    <i class="fas fa-muscle me-2"></i>Músculos Secundarios (opcional)
+                </label>
+                <input type="text" class="form-control" id="musculos_secundarios" name="musculos_secundarios" 
+                       placeholder="Separados por comas">
+            </div>
+            
+            <div class="mb-3">
+                <label for="variaciones" class="form-label">
+                    <i class="fas fa-random me-2"></i>Variaciones (opcional)
+                </label>
+                <input type="text" class="form-control" id="variaciones" name="variaciones" 
+                       placeholder="Separadas por comas">
+            </div>
+            
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save me-2"></i>Guardar Ejercicio
+                </button>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

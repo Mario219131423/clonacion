@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title text-center mb-4">
+            <i class="fas fa-history me-2"></i>Historial de Entrenamientos
+        </h2>
+        
+        {% if workouts %}
+            {% for workout in workouts %}
+                <div class="card mb-3 workout-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-calendar-check me-2 text-primary"></i>
+                                Entrenamiento del {{ workout.date.strftime('%d/%m/%Y %H:%M') }}
+                            </h5>
+                            <span class="badge bg-primary">
+                                <i class="fas fa-clock me-1"></i>{{ workout.duration }} minutos
+                            </span>
+                        </div>
+                        
+                        <div class="history-item">
+                            <h6 class="mb-2">
+                                <i class="fas fa-dumbbell me-2 text-primary"></i>Ejercicios Realizados:
+                            </h6>
+                            <div class="mb-3">
+                                {% for exercise in workout.exercises.split(',') %}
+                                    <span class="badge bg-info me-1">{{ exercise.strip() }}</span>
+                                {% endfor %}
+                            </div>
+                            
+                            {% if workout.notes %}
+                                <div class="mt-3">
+                                    <h6 class="mb-2">
+                                        <i class="fas fa-sticky-note me-2 text-primary"></i>Notas:
+                                    </h6>
+                                    <p class="mb-0">{{ workout.notes }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No hay entrenamientos registrados. ¡Comienza a entrenar!
+            </div>
+        {% endif %}
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('evaluacion') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Nuevo Entrenamiento
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

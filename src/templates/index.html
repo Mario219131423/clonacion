@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h1 class="card-title text-center mb-4">Bienvenido al Sistema Experto de Gimnasio</h1>
+        <p class="card-text">
+            Este sistema experto está diseñado para ayudarte a crear rutinas de ejercicio personalizadas
+            basadas en tus objetivos, nivel de condición física y preferencias.
+        </p>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('evaluacion') }}" class="btn btn-primary btn-lg">Comenzar Evaluación</a>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Evaluación Personalizada</h5>
+                <p class="card-text">Responderemos algunas preguntas para entender mejor tus necesidades y objetivos.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Rutinas Personalizadas</h5>
+                <p class="card-text">Recibirás recomendaciones de ejercicios adaptadas a tu nivel y objetivos.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Seguimiento de Progreso</h5>
+                <p class="card-text">Podrás ver tu progreso y ajustar tu rutina según sea necesario.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
