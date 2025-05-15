@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0" id="question-counter">Cuestionario Experto</h4>
+                    <div class="progress mt-2" style="height: 10px;">
+                        <div class="progress-bar" id="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="question-container">
+                        <h5 class="mb-4" id="question-text">{{ question.text }}</h5>
+                        <div id="answer-input" class="mb-4">
+                            {% if question.type == 'number' %}
+                                <input type="number" class="form-control" id="number-input" min="{{ question.min }}" max="{{ question.max }}" required>
+                            {% elif question.type == 'select' %}
+                                <select class="form-select" id="select-input" required>
+                                    {% for option in question.options %}
+                                        <option value="{{ option }}">{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% elif question.type == 'boolean' %}
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="boolean-input" id="true-input" value="true" required>
+                                    <label class="form-check-label" for="true-input">Sí</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="boolean-input" id="false-input" value="false" required>
+                                    <label class="form-check-label" for="false-input">No</label>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="mt-4 text-center">
+                            <button id="submit-answer" class="btn btn-primary">Siguiente</button>
+                        </div>
+                    </div>
+                    <div id="loading-container" style="display: none;" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="mt-3">Procesando respuesta...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Variables para seguimiento de preguntas
+    let currentQuestion = JSON.parse('{{ question|tojson|safe }}');
+    let questionCounter = 1;
+    let answeredQuestions = {};
+    
+    // Estimamos alrededor de 25 preguntas en total
+    const TOTAL_QUESTIONS = 25;
+    
+    // Actualizar el contador y barra de progreso
+    function updateProgress() {
+        const progressPercent = Math.round((questionCounter / TOTAL_QUESTIONS) * 100);
+        document.getElementById('question-counter').textContent = `Pregunta ${questionCounter} de ${TOTAL_QUESTIONS}`;
+        document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+        document.getElementById('progress-bar').setAttribute('aria-valuenow', progressPercent);
+    }
+    
+    // Obtener el valor de la respuesta actual
+    function getCurrentAnswer() {
+        switch(currentQuestion.type) {
+            case 'number':
+                return parseInt(document.getElementById('number-input').value);
+            case 'select':
+                return document.getElementById('select-input').value;
+            case 'boolean':
+                return document.querySelector('input[name="boolean-input"]:checked')?.value === 'true';
+            default:
+                return null;
+        }
+    }
+    
+    // Enviar respuesta al servidor
+    function submitAnswer() {
+        const answer = getCurrentAnswer();
+        
+        // Validar respuesta
+        if (answer === null || answer === undefined || (currentQuestion.type === 'number' && isNaN(answer))) {
+            alert('Por favor, proporciona una respuesta válida.');
+            return;
+        }
+        
+        // Mostrar spinner de carga
+        document.getElementById('question-container').style.display = 'none';
+        document.getElementById('loading-container').style.display = 'block';
+        
+        // Guardar respuesta
+        answeredQuestions[currentQuestion.id] = answer;
+        
+        // Enviar respuesta al servidor
+        fetch('/submit_answer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                question_id: currentQuestion.id,
+                answer: answer
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'continue') {
+                // Mostrar siguiente pregunta
+                currentQuestion = data.question;
+                questionCounter++;
+                updateUI();
+            } else if (data.status === 'complete') {
+                // Redireccionar a la página de resultados
+                window.location.href = data.redirect;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error al procesar tu respuesta. Inténtalo de nuevo.');
+            document.getElementById('question-container').style.display = 'block';
+            document.getElementById('loading-container').style.display = 'none';
+        });
+    }
+    
+    // Actualizar la UI con la pregunta actual
+    function updateUI() {
+        // Actualizar contador y barra de progreso
+        updateProgress();
+        
+        // Actualizar texto de la pregunta
+        document.getElementById('question-text').textContent = currentQuestion.text;
+        
+        // Actualizar el input según el tipo de pregunta
+        const answerInput = document.getElementById('answer-input');
+        let inputHTML = '';
+        
+        switch(currentQuestion.type) {
+            case 'number':
+                inputHTML = `<input type="number" class="form-control" id="number-input" min="${currentQuestion.min}" max="${currentQuestion.max}" required>`;
+                break;
+            case 'select':
+                inputHTML = `<select class="form-select" id="select-input" required>`;
+                currentQuestion.options.forEach(option => {
+                    inputHTML += `<option value="${option}">${option}</option>`;
+                });
+                inputHTML += `</select>`;
+                break;
+            case 'boolean':
+                inputHTML = `
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="boolean-input" id="true-input" value="true" required>
+                        <label class="form-check-label" for="true-input">Sí</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="boolean-input" id="false-input" value="false" required>
+                        <label class="form-check-label" for="false-input">No</label>
+                    </div>
+                `;
+                break;
+        }
+        
+        answerInput.innerHTML = inputHTML;
+        
+        // Mostrar contenedor de pregunta, ocultar loading
+        document.getElementById('question-container').style.display = 'block';
+        document.getElementById('loading-container').style.display = 'none';
+    }
+    
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', function() {
+        updateProgress();
+        
+        // Manejar envío del formulario
+        document.getElementById('submit-answer').addEventListener('click', submitAnswer);
+    });
+</script>
+{% endblock %}

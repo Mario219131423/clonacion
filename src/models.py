@@ -1,10 +1,9 @@
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from .config import db
 
-db = SQLAlchemy()
-
+# Modelos transaccionales
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -55,38 +54,86 @@ class WorkoutHistory(db.Model):
     dificultad = db.Column(db.String(20))  # Fácil, Moderado, Difícil
 
 class Exercise(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), nullable=False)
-    grupo_muscular = db.Column(db.String(50), nullable=False)
-    dificultad = db.Column(db.String(20), nullable=False)  # Principiante, Intermedio, Avanzado
-    requiere_equipo = db.Column(db.Boolean, default=False)
-    descripcion = db.Column(db.Text, nullable=False)
-    instrucciones = db.Column(db.Text)
-    video_url = db.Column(db.String(200))
-    imagen_url = db.Column(db.String(200))
-    variaciones = db.Column(db.String(200))
-    musculos_secundarios = db.Column(db.String(200))
-    series_recomendadas = db.Column(db.String(50))
-    repeticiones_recomendadas = db.Column(db.String(50))
-    descanso_recomendado = db.Column(db.String(50))
-    added_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    __tablename__ = 'exercise'
     
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    muscle_group = db.Column(db.String(50))
+    difficulty = db.Column(db.String(20))
+    added_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    
+    def __init__(self, name, muscle_group=None, difficulty=None):
+        self.name = name
+        self.muscle_group = muscle_group
+        self.difficulty = difficulty
+        
+    def add_expert_knowledge(self, muscle_group, difficulty_level, target_muscles,
+                           secondary_muscles=None, equipment_needed=None,
+                           proper_form_notes=None, common_mistakes=None,
+                           safety_precautions=None, contraindications=None,
+                           benefits=None, created_by=None):
+        """Añade conocimiento experto sobre el ejercicio a la base de conocimiento."""
+        from .knowledge_base.manager import KnowledgeBaseManager
+        kb_manager = KnowledgeBaseManager()
+        kb_manager.add_exercise_knowledge(
+            exercise_id=self.id,
+            muscle_group=muscle_group,
+            difficulty_level=difficulty_level,
+            target_muscles=target_muscles,
+            secondary_muscles=secondary_muscles,
+            equipment_needed=equipment_needed,
+            proper_form_notes=proper_form_notes,
+            common_mistakes=common_mistakes,
+            safety_precautions=safety_precautions,
+            contraindications=contraindications,
+            benefits=benefits,
+            created_by=created_by
+        )
+    
+    def get_expert_knowledge(self):
+        """Obtiene el conocimiento experto sobre el ejercicio."""
+        from .knowledge_base.manager import KnowledgeBaseManager
+        kb_manager = KnowledgeBaseManager()
+        return kb_manager.get_exercise_knowledge(self.id)
+
     def to_dict(self):
         return {
             'id': self.id,
-            'nombre': self.nombre,
-            'grupo_muscular': self.grupo_muscular,
-            'dificultad': self.dificultad,
-            'requiere_equipo': self.requiere_equipo,
-            'descripcion': self.descripcion,
-            'instrucciones': self.instrucciones,
-            'video_url': self.video_url,
-            'imagen_url': self.imagen_url,
-            'variaciones': self.variaciones,
-            'musculos_secundarios': self.musculos_secundarios,
-            'series_recomendadas': self.series_recomendadas,
-            'repeticiones_recomendadas': self.repeticiones_recomendadas,
-            'descanso_recomendado': self.descanso_recomendado
-        } 
+            'name': self.name,
+            'muscle_group': self.muscle_group,
+            'difficulty': self.difficulty
+        }
+
+# Modelos para la base de conocimiento
+class KnowledgeExercise(db.Model):
+    __bind_key__ = 'knowledge'
+    __tablename__ = 'knowledge_exercise'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    muscle_group = db.Column(db.String(50))
+    difficulty = db.Column(db.String(20))
+    description = db.Column(db.Text)
+    created_by = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class KnowledgeRule(db.Model):
+    __bind_key__ = 'knowledge'
+    __tablename__ = 'knowledge_rule'
+    id = db.Column(db.Integer, primary_key=True)
+    rule_name = db.Column(db.String(100), nullable=False)
+    antecedent = db.Column(db.Text)
+    consequent = db.Column(db.Text)
+    priority = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class KnowledgeDecision(db.Model):
+    __bind_key__ = 'knowledge'
+    __tablename__ = 'knowledge_decision'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    decision_type = db.Column(db.String(50))
+    input_facts = db.Column(db.Text)
+    applied_rules = db.Column(db.Text)
+    conclusion = db.Column(db.Text)
+    confidence_score = db.Column(db.Float)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow) 
